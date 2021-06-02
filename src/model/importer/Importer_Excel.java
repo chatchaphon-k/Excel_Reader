@@ -2,42 +2,76 @@ package model.importer;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+//SUPPORT XLS & XLSX
 public class Importer_Excel
 {
-    private XSSFWorkbook wb;
-    private XSSFSheet sheet;
+    private Workbook wb;
+    private Sheet sheet;
 
-    public XSSFWorkbook Wb() { return wb; }
-    public XSSFSheet Sheet() { return sheet; }
+    public Workbook Wb() { return wb; }
+    public Sheet get_sheet() { return sheet; }
 
-    public Importer_Excel(String path2file) throws FileNotFoundException, IOException
+    public Importer_Excel(String path2file, boolean is_xls) throws IOException
     {
-//        path2file = "C:\\Users\\ckit\\Documents\\NetBeansProjects\\SubModules\\src\\IT Task List & Acitivity Plan.xlsx";
-        path2file = "C:\\Users\\ckit\\Documents\\NetBeansProjects\\SubModules\\src\\Covid-19 Vaccination Record Survey (Relatives).xlsx";
-        FileInputStream FIS = new FileInputStream(new File(path2file));
-        wb = new XSSFWorkbook(FIS);
+        set_workbook(path2file, is_xls);
         set_firstSheet();
     }
 
-    public Importer_Excel(File file) throws FileNotFoundException, IOException
+    public Importer_Excel(File file, boolean is_xls) throws IOException
     {
-        FileInputStream FIS = new FileInputStream(file);
-        wb = new XSSFWorkbook(FIS);
+        set_workbook(file, is_xls);
+        set_firstSheet();
     }
 
-    public Importer_Excel(FileInputStream FIS) throws IOException
+    public Importer_Excel(String path2file, boolean is_xls, int sheet_num) throws IOException
     {
-        wb = new XSSFWorkbook(FIS);
+        set_workbook(path2file, is_xls);
+        set_sheet(sheet_num - 1);
+    }
+
+    public Importer_Excel(File file, boolean is_xls, int sheet_num) throws IOException
+    {
+        set_workbook(file, is_xls);
+        set_sheet(sheet_num - 1);
+    }
+
+    public void set_workbook(String path2file, boolean is_xls) throws IOException
+    {
+//        set_workbook(new FileInputStream(new File(path2file)), is_xls);
+        set_workbook(new FileInputStream(new File(path2file)), path2file.substring(path2file.lastIndexOf(".") + 1));
+    }
+
+    public void set_workbook(File file, boolean is_xls) throws IOException
+    {
+//        set_workbook(new FileInputStream(file), is_xls);
+        String filename = file.getName();
+        set_workbook(new FileInputStream(file), filename.substring(filename.lastIndexOf(".") + 1));
+    }
+
+    public void set_workbook(FileInputStream FIS, boolean is_xls) throws IOException
+    {
+        if(is_xls)
+            wb = new HSSFWorkbook(FIS);
+        else
+            wb = new XSSFWorkbook(FIS);
+    }
+
+    public void set_workbook(FileInputStream FIS, String ext) throws IOException
+    {
+        if(ext.equalsIgnoreCase("xls"))
+            wb = new HSSFWorkbook(FIS);
+        else if(ext.equalsIgnoreCase("xlsx"))
+            wb = new XSSFWorkbook(FIS);
     }
 
     public void set_firstSheet()
@@ -90,27 +124,25 @@ public class Importer_Excel
         }
     }
 
-    public void itr_rowCell_2()
+    public void itr_rowCell_3()
     {
         DataFormatter dataFormatter = new DataFormatter();
-        Iterator<Row> itr = sheet.iterator();    //iterating over excel file  
         int total_rows_i = sheet.getLastRowNum();
         for(int row_i = 0; row_i <= total_rows_i; row_i++)
         {
-            XSSFRow row_data = sheet.getRow(row_i);
-//            System.out.println("ROW: " + (row_i + 1) + " | phyxNumCells: " + row_data.getLastCellNum());
+            Row row_data = sheet.getRow(row_i);
             for(int col_i = 0; col_i < row_data.getLastCellNum(); col_i++)
-            {
                 System.out.print(dataFormatter.formatCellValue(row_data.getCell(col_i)) + "\t");
-            }
             System.out.println("");
         }
     }
 
     public static void main(String[] args) {
         try {
-            Importer_Excel imp_exl = new Importer_Excel("");
-            imp_exl.itr_rowCell_2();
+            Importer_Excel imp_exl = new Importer_Excel("C:\\Users\\ckit\\Documents\\NetBeansProjects\\SubModules\\src\\052DS_AMS20190331.xls", true);
+            imp_exl.itr_rowCell_3();
+            imp_exl = new Importer_Excel("C:\\Users\\ckit\\Documents\\NetBeansProjects\\SubModules\\src\\Covid-19 Vaccination Record Survey (Relatives).xlsx", false);
+            imp_exl.itr_rowCell();
         } catch (Exception e) {
             e.printStackTrace();
         }
