@@ -13,7 +13,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 //SUPPORT XLS & XLSX
-public class Importer_Excel
+public class Reader_Excel
 {
     private Workbook wb;
     private Sheet sheet;
@@ -21,25 +21,25 @@ public class Importer_Excel
     public Workbook Wb() { return wb; }
     public Sheet get_sheet() { return sheet; }
 
-    public Importer_Excel(String path2file, boolean is_xls) throws IOException
+    public Reader_Excel(String path2file, boolean is_xls) throws IOException
     {
         set_workbook(path2file, is_xls);
         set_firstSheet();
     }
 
-    public Importer_Excel(File file, boolean is_xls) throws IOException
+    public Reader_Excel(File file, boolean is_xls) throws IOException
     {
         set_workbook(file, is_xls);
         set_firstSheet();
     }
 
-    public Importer_Excel(String path2file, boolean is_xls, int sheet_num) throws IOException
+    public Reader_Excel(String path2file, boolean is_xls, int sheet_num) throws IOException
     {
         set_workbook(path2file, is_xls);
         set_sheet(sheet_num - 1);
     }
 
-    public Importer_Excel(File file, boolean is_xls, int sheet_num) throws IOException
+    public Reader_Excel(File file, boolean is_xls, int sheet_num) throws IOException
     {
         set_workbook(file, is_xls);
         set_sheet(sheet_num - 1);
@@ -139,9 +139,9 @@ public class Importer_Excel
 
     public static void main(String[] args) {
         try {
-            Importer_Excel imp_exl = new Importer_Excel("C:\\Users\\ckit\\Documents\\NetBeansProjects\\SubModules\\src\\052DS_AMS20190331.xls", true);
+            Reader_Excel imp_exl = new Reader_Excel("C:\\Users\\ckit\\Documents\\NetBeansProjects\\SubModules\\src\\052DS_AMS20190331.xls", true);
             imp_exl.itr_rowCell_3();
-            imp_exl = new Importer_Excel("C:\\Users\\ckit\\Documents\\NetBeansProjects\\SubModules\\src\\Covid-19 Vaccination Record Survey (Relatives).xlsx", false);
+            imp_exl = new Reader_Excel("C:\\Users\\ckit\\Documents\\NetBeansProjects\\SubModules\\src\\Covid-19 Vaccination Record Survey (Relatives).xlsx", false);
             imp_exl.itr_rowCell();
         } catch (Exception e) {
             e.printStackTrace();
