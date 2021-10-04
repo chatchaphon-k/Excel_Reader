@@ -13,50 +13,63 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 //SUPPORT XLS & XLSX
-public class Reader_Excel
+public abstract class Reader_Excel
 {
+    public DataFormatter dataFormatter = new DataFormatter();
+
+    private String filename;
     private Workbook wb;
     private Sheet sheet;
+    private int total_rows;
+    protected Row row;
 
-    public Workbook Wb() { return wb; }
-    public Sheet get_sheet() { return sheet; }
+    public String get_reading_filename() { return filename; }
+    public Workbook wb() { return wb; }
+    public Sheet sheet() { return sheet; }
+    public int total_rows() { return total_rows; }
 
     public Reader_Excel(String path2file) throws IOException
     {
         set_workbook(path2file);
         set_firstSheet();
+        set_total_rows();
     }
 
     public Reader_Excel(File file) throws IOException
     {
         set_workbook(file);
         set_firstSheet();
+        set_total_rows();
     }
 
     public Reader_Excel(String path2file, int sheet_num) throws IOException
     {
         set_workbook(path2file);
         set_sheet(sheet_num - 1);
+        set_total_rows();
     }
 
     public Reader_Excel(File file, int sheet_num) throws IOException
     {
         set_workbook(file);
         set_sheet(sheet_num - 1);
+        set_total_rows();
     }
 
-    public void set_workbook(String path2file) throws IOException
+    protected void set_workbook(String path2file) throws IOException
     {
-        set_workbook(new FileInputStream(new File(path2file)), path2file.substring(path2file.lastIndexOf(".") + 1));
+        File file = new File(path2file);
+        filename = file.getName();
+        set_workbook(new FileInputStream(file), path2file.substring(path2file.lastIndexOf(".") + 1));
     }
 
-    public void set_workbook(File file) throws IOException
+    protected void set_workbook(File file) throws IOException
     {
-        String filename = file.getName();
+        filename = file.getName();
         set_workbook(new FileInputStream(file), filename.substring(filename.lastIndexOf(".") + 1));
     }
 
-    public void set_workbook(FileInputStream FIS, String ext) throws IOException
+    protected void set_workbook(FileInputStream FIS, String ext) throws IOException
     {
         if(ext.equalsIgnoreCase("xls"))
             wb = new HSSFWorkbook(FIS);
@@ -64,25 +77,32 @@ public class Reader_Excel
             wb = new XSSFWorkbook(FIS);
     }
 
-    public void set_firstSheet()
+    protected void set_firstSheet()
     {
         set_sheet(0);
     }
 
-    public void set_lastSheet()
+    protected void set_lastSheet()
     {
         set_sheet(wb.getNumberOfSheets());
     }
 
-    public void set_sheet(int sheet_i)
+    protected void set_sheet(int sheet_i)
     {
         sheet = wb.getSheetAt(sheet_i);
     }
 
-    public void get_colsName()
+    protected void set_total_rows()
     {
-        
+        total_rows = sheet.getLastRowNum();
     }
+
+    public String get_cellData(int col_i)
+    {
+        return dataFormatter.formatCellValue(row.getCell(col_i));
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="TEST RUN">
 
     public void itr_rowCell()
     {
@@ -94,7 +114,7 @@ public class Reader_Excel
             while (cellIterator.hasNext())
             {
                 Cell cell = cellIterator.next();
-                DataFormatter dataFormatter = new DataFormatter();
+                dataFormatter = new DataFormatter();
                 System.out.print(dataFormatter.formatCellValue(cell) + "\t\t\t");
             }
             System.out.println("");
@@ -103,7 +123,7 @@ public class Reader_Excel
 
     public void itr_rowCell_3()
     {
-        DataFormatter dataFormatter = new DataFormatter();
+        dataFormatter = new DataFormatter();
         int total_rows_i = sheet.getLastRowNum();
         for(int row_i = 0; row_i <= total_rows_i; row_i++)
         {
@@ -125,4 +145,6 @@ public class Reader_Excel
 //            e.printStackTrace();
 //        }
 //    }
+
+    // </editor-fold>
 }
