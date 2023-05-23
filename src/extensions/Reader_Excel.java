@@ -20,40 +20,38 @@ public abstract class Reader_Excel
     private String filename;
     private Workbook wb;
     private Sheet sheet;
-    private int total_rows;
     protected Row row;
+    private int total_sheets;
+    private int total_rows;
 
     public String get_reading_filename() { return filename; }
     public Workbook wb() { return wb; }
     public Sheet sheet() { return sheet; }
+    public int total_sheets() { return total_sheets; }
     public int total_rows() { return total_rows; }
 
-    public Reader_Excel(String path2file) throws IOException
+    public void init(String path2file) throws IOException
     {
         set_workbook(path2file);
         set_firstSheet();
-        set_total_rows();
     }
 
-    public Reader_Excel(File file) throws IOException
+    public void init(File file) throws IOException
     {
         set_workbook(file);
         set_firstSheet();
-        set_total_rows();
     }
 
-    public Reader_Excel(String path2file, int sheet_num) throws IOException
+    public void init(String path2file, int sheet_num) throws IOException
     {
         set_workbook(path2file);
         set_sheet(sheet_num - 1);
-        set_total_rows();
     }
 
-    public Reader_Excel(File file, int sheet_num) throws IOException
+    public void init(File file, int sheet_num) throws IOException
     {
         set_workbook(file);
         set_sheet(sheet_num - 1);
-        set_total_rows();
     }
 
     protected void set_workbook(String path2file) throws IOException
@@ -75,6 +73,7 @@ public abstract class Reader_Excel
             wb = new HSSFWorkbook(FIS);
         else if(ext.equalsIgnoreCase("xlsx"))
             wb = new XSSFWorkbook(FIS);
+        set_total_sheets();
     }
 
     protected void set_firstSheet()
@@ -90,6 +89,12 @@ public abstract class Reader_Excel
     protected void set_sheet(int sheet_i)
     {
         sheet = wb.getSheetAt(sheet_i);
+        set_total_rows();
+    }
+
+    private void set_total_sheets()
+    {
+        total_sheets = wb.getNumberOfSheets();
     }
 
     protected void set_total_rows()
