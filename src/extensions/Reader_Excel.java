@@ -22,13 +22,15 @@ public abstract class Reader_Excel
     private Sheet sheet;
     protected Row row;
     private int total_sheets;
-    private int total_rows;
+    private int total_rows_i;
 
     public String get_reading_filename() { return filename; }
     public Workbook wb() { return wb; }
     public Sheet sheet() { return sheet; }
     public int total_sheets() { return total_sheets; }
-    public int total_rows() { return total_rows; }
+    public int total_rows_i() { return total_rows_i; }
+
+    // <editor-fold defaultstate="collapsed" desc="Init">
 
     public void init(String path2file) throws IOException
     {
@@ -54,11 +56,20 @@ public abstract class Reader_Excel
         set_sheet(sheet_num - 1);
     }
 
+    public void init(File file, String sheet_name) throws IOException
+    {
+        set_workbook(file);
+        sheet = wb.getSheet(sheet_name);
+        set_total_rows();
+    }
+
+    //</editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Setter">
+
     protected void set_workbook(String path2file) throws IOException
     {
-        File file = new File(path2file);
-        filename = file.getName();
-        set_workbook(new FileInputStream(file), path2file.substring(path2file.lastIndexOf(".") + 1));
+        set_workbook(new File(path2file));
     }
 
     protected void set_workbook(File file) throws IOException
@@ -99,7 +110,21 @@ public abstract class Reader_Excel
 
     protected void set_total_rows()
     {
-        total_rows = sheet.getLastRowNum();
+        total_rows_i = sheet.getLastRowNum();
+    }
+
+    //</editor-fold>
+    
+    public boolean is_no_data()
+    {
+        if(total_rows_i == 0)
+            return true;
+
+        row = sheet().getRow(0);
+        if (row == null || row.getLastCellNum() <= 0 || row.getCell(0) == null || row.getCell(0).getStringCellValue().isEmpty())
+            return true;
+
+        return false;
     }
 
     public String get_cellData(int col_i)
